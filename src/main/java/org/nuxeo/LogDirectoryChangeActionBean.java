@@ -30,11 +30,11 @@ public class LogDirectoryChangeActionBean implements Serializable {
 
     protected AuditLogger logger;
 
+    @In(create = true)
+    private transient NuxeoPrincipal currentNuxeoPrincipal;
+
     @Observer(EventNames.DIRECTORY_CHANGED)
     public void run(String dirName) {
-        String message = "Hello from LogDirectoryChange : ";
-        log.debug(message);
-        log.error(dirName);
         AuditLogger logger = Framework.getService(AuditLogger.class);	
         LogEntry entry = newEntry(logger,dirName,new Date());
         logger.addLogEntries(Collections.singletonList(entry));
@@ -44,6 +44,7 @@ public class LogDirectoryChangeActionBean implements Serializable {
         entry.setEventId(EventNames.DIRECTORY_CHANGED);
         entry.setEventDate(date);
         entry.setCategory("directory change");
+        entry.setPrincipalName(currentNuxeoPrincipal.getName());
         entry.setComment(dirName);
         return entry;
     }
